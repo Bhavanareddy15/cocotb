@@ -1,0 +1,7 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1775678947" />
+    <testcase name="adder_basic_test" classname="test_adder" file="/mnt/c/Users/marpa/cocotb/simple_adder/test_adder.py" lineno="16" time="0.00024271011352539062" sim_time_ns="2.0" ratio_time="8240.282907662082" />
+    <testcase name="adder_randomised_test" classname="test_adder" file="/mnt/c/Users/marpa/cocotb/simple_adder/test_adder.py" lineno="33" time="0.0003788471221923828" sim_time_ns="20.0" ratio_time="52791.74323473883" />
+  </testsuite>
+</testsuites>
