@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Hardware simulation build artifacts
+sim_build/
+
 # Distribution / packaging
 .Python
 build/

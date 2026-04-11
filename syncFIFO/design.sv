@@ -1,4 +1,4 @@
-module fifo_debug #(
+module fifo_sync #(
   parameter int DEPTH = 4,
   parameter int WIDTH = 8
 ) (
