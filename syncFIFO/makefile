@@ -1,6 +1,8 @@
 TOPLEVEL_LANG ?= verilog
  
+ 
 PWD=$(shell pwd)
+export PYTHONPATH := $(PWD):$(PYTHONPATH)
  
 ifeq ($(TOPLEVEL_LANG),verilog)
     VERILOG_SOURCES = $(PWD)/design.sv
