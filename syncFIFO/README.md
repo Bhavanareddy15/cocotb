@@ -98,20 +98,6 @@ The runner inside `test_FIFO.py` controls:
 
 ---
 
-## Key Differences Between the Two Flows
-
-| | `make` | `python test_FIFO.py` |
-|---|---|---|
-| Entry point | `makefile` | `test_fifo_runner()` in `test_FIFO.py` |
-| Timescale | Set by cocotb's `Makefile.sim` | Must be set explicitly via `timescale=` in runner |
-| Simulator | `SIM` env variable | `SIM` env variable or hardcoded default |
-| Build artifacts | `sim_build/` | `sim_build/` |
-| Typical use | Development, CI | pytest discovery, scripted flows |
-
-Both flows execute the same `@cocotb.test()` functions in `test_FIFO.py`.
-
----
-
 ## Expected Output
 
 A passing run looks like:
@@ -123,12 +109,3 @@ A passing run looks like:
 ```
 
 ---
-
-## Common Errors
-
-| Error | Cause | Fix |
-|---|---|---|
-| `No rule to make target '...design.sv'` | Wrong path in `VERILOG_SOURCES` | Set `VERILOG_SOURCES = $(PWD)/design.sv` |
-| `ModuleNotFoundError: No module named 'test_FIFO'` | `COCOTB_TEST_MODULES` name mismatch | Match exactly to filename (case-sensitive) |
-| `Unable to accurately represent 1(ns)` | Clock period too small for simulator precision | Use `Clock(dut.clk, 10, unit="ns")` and set `timescale=("1ns","1ps")` in runner |
-| `FileNotFoundError: design.sv` | Wrong `proj_path` in runner | Use `Path(__file__).resolve().parent` (not `.parent.parent`) |
