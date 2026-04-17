@@ -104,7 +104,6 @@ make COCOTB_TEST_FILTER=fifo_basic_test
 make COCOTB_TEST_FILTER=fifo_full_test
 make COCOTB_TEST_FILTER=fifo_empty_test
 make COCOTB_TEST_FILTER=fifo_concurrent_test
-make COCOTB_TEST_FILTER=fifo_reset_midop_test
 make COCOTB_TEST_FILTER=fifo_random_test
 ```
 
@@ -121,7 +120,19 @@ pytest test_FIFO.py::test_fifo_runner -k fifo_basic_test
 A full passing run looks like:
 
 ```
-![image](https://github.com/user-attachments/assets/964f15e0-b74d-4427-86a0-9ded93d674bb)
+351.00ns INFO     cocotb.regression                  *****************************************************************************************
+   351.00ns INFO     cocotb.regression                  *****************************************************************************************
+                                                        ** TEST                             STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        *****************************************************************************************
+                                                        ** test_FIFO.fifo_full_test          PASS           8.00           0.00       7603.54  **
+                                                        ** test_FIFO.fifo_empty_test         PASS          17.00           0.00       7849.31  **
+                                                        ** test_FIFO.fifo_concurrent_test    PASS           9.00           0.00      10207.88  **
+                                                        ** test_FIFO.fifo_random_test        PASS         299.00           0.02      14448.79  **
+                                                        ** test_FIFO.fifo_basic_test         PASS           6.00           0.00       4193.61  **
+                                                        ** test_FIFO.fifo_reset_midop_test   PASS          12.00           0.00      12794.01  **
+                                                        *****************************************************************************************
+                                                        ** TESTS=6 PASS=6 FAIL=0 SKIP=0                   351.00           0.04       7888.66  **
+                                                        *****************************************************************************************
 ```
 
 ---
