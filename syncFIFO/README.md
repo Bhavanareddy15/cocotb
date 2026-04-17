@@ -1,111 +1,145 @@
-# Synchronous FIFO Cocotb Testbench
+# syncFIFO
+
+A synchronous FIFO design verified using cocotb.
+
+---
 
 ## Project Structure
 
 ```
 syncFIFO/
-├── design.sv       # RTL design (fifo_sync module)
-├── makefile        # Makefile flow
-├── test_FIFO.py    # Testbench + runner
-└── fifo_model.py   # (optional) Python reference model
+├── design.sv        # RTL design (fifo_sync module, depth=4, width=8)
+├── fifo_model.py    # Python reference model
+├── makefile         # Makefile flow entry point
+├── test_FIFO.py     # Testbench + runner
+└── README.md
 ```
 
 ---
 
 ## Prerequisites
 
-Install cocotb and Icarus Verilog:
-
 ```bash
-pip install cocotb cocotb-tools
-sudo apt install iverilog      # Ubuntu/WSL
+pip install cocotb cocotb-tools pytest
+sudo apt install iverilog      # Ubuntu / WSL
 ```
 
-Verify both are available:
+---
 
-```bash
-cocotb-config --version
-iverilog -V
-```
+## Design Parameters
+
+| Parameter | Value |
+|-----------|-------|
+| Depth     | 4     |
+| Width     | 8 bits |
+| Type      | Synchronous, registered output |
+| Reset     | Synchronous, active high |
+
+---
+
+## Test Cases
+
+### `fifo_basic_test`
+Writes a single value (`0xAB`) and reads it back. Checks that the DUT output matches the model and that the `full` and `empty` flags are correct after the operation.
+
+### `fifo_full_test`
+Writes 4 items to fill the FIFO completely. Verifies the `full` flag asserts and `empty` stays low. Then attempts an extra write while full and confirms the FIFO is not corrupted.
+
+### `fifo_empty_test`
+Fills the FIFO then drains it completely, comparing each read against the model. Verifies the `empty` flag asserts after the last read. Then attempts an extra read while empty and confirms `dout` does not change.
+
+### `fifo_concurrent_test`
+Asserts `wr_en` and `rd_en` simultaneously in the same clock cycle. Verifies that the item count stays stable (net zero change) and that the correct data is read out and written in.
+
+### `fifo_reset_midop_test`
+Writes 3 items into the FIFO, then asserts reset mid-operation. Verifies that after reset, `empty` is high, `full` is low, and `dout` is cleared to zero.
+
+### `fifo_random_test`
+Runs 200 cycles of random interleaved reads, writes, and idle cycles. Every operation is mirrored on the Python model and compared against the DUT. `full` and `empty` flags are checked on every cycle.
 
 ---
 
 ## Running the Tests
 
-There are two ways to run the testbench.
+### All tests — using Make
 
----
-
-### 1. Using Make (recommended)
-
-This is the standard cocotb flow. Run from inside the `syncFIFO/` directory:
+From inside the `syncFIFO/` directory:
 
 ```bash
 make
 ```
 
-To choose a different simulator:
+This compiles `design.sv` with Icarus Verilog and runs all `@cocotb.test()` functions in `test_FIFO.py` in the order they are defined.
+
+To clean build artifacts and re-run:
 
 ```bash
-make SIM=verilator
+make clean && make
 ```
-
-To clean build artifacts and force a fresh run:
-
-```bash
-make clean
-make
-```
-
-**How it works:**
-
-```
-make → iverilog compiles design.sv → vvp loads cocotb → cocotb imports test_FIFO.py
-```
-
-The `makefile` controls:
-- Which simulator is used (`SIM`, defaults to `icarus`)
-- Which RTL file is compiled (`VERILOG_SOURCES`)
-- Which module is the top level (`COCOTB_TOPLEVEL`)
-- Which Python test file is loaded (`COCOTB_TEST_MODULES`)
 
 ---
 
-### 2. Running the File Directly
-
-The `test_FIFO.py` file contains a `test_fifo_runner()` function at the bottom that replicates the Makefile flow in pure Python. Run it with:
+### All tests — using the Python runner
 
 ```bash
 python test_FIFO.py
 ```
 
-Or via pytest (install with `pip install pytest`):
+Or via pytest:
 
 ```bash
 pytest test_FIFO.py
 ```
 
-**How it works:**
+---
 
-```
-python test_FIFO.py → test_fifo_runner() → runner.build() → runner.test()
+### Running a single specific test
+
+cocotb supports filtering by test name using the `COCOTB_TEST_FILTER` environment variable.
+
+**Via Make:**
+
+```bash
+make COCOTB_TEST_FILTER=fifo_basic_test
+make COCOTB_TEST_FILTER=fifo_full_test
+make COCOTB_TEST_FILTER=fifo_empty_test
+make COCOTB_TEST_FILTER=fifo_concurrent_test
+make COCOTB_TEST_FILTER=fifo_reset_midop_test
+make COCOTB_TEST_FILTER=fifo_random_test
 ```
 
-The runner inside `test_FIFO.py` controls:
-- Source files and top-level module
-- Timescale (`1ns / 1ps`)
-- Which test module to load
+**Via Python runner / pytest:**
+
+```bash
+pytest test_FIFO.py::test_fifo_runner -k fifo_basic_test
+```
 
 ---
 
 ## Expected Output
 
-A passing run looks like:
+A full passing run looks like:
 
 ```
-** TEST                          STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
-** test_FIFO.fifo_basic_test      PASS           5.00           0.01        335.58  **
-** TESTS=1 PASS=1 FAIL=0 SKIP=0                  5.00           0.02        260.31  **
+<img width="1057" height="232" alt="image" src="https://github.com/user-attachments/assets/c0f35034-ea0f-498d-bd74-acf58e8ed4ca" />
+
+```
+
+---
+
+## How the Model Works
+
+`fifo_model.py` implements a Python list-based FIFO that mirrors the DUT:
+
+```python
+model = FifoModel(depth=4)
+model.write(data)    # mirrors wr_en
+model.read()         # mirrors rd_en, returns expected dout
+model.full()         # mirrors full flag
+model.empty()        # mirrors empty flag
+```
+
+Every test drives the same data into both the DUT and the model, then asserts that outputs and flags match. Any mismatch fails the test immediately with a message showing both the DUT value and the expected model value.
 ```
 
 ---
