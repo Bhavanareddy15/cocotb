@@ -121,8 +121,7 @@ pytest test_FIFO.py::test_fifo_runner -k fifo_basic_test
 A full passing run looks like:
 
 ```
-<img width="1057" height="232" alt="image" src="https://github.com/user-attachments/assets/c0f35034-ea0f-498d-bd74-acf58e8ed4ca" />
-
+![image](https://github.com/user-attachments/assets/964f15e0-b74d-4427-86a0-9ded93d674bb)
 ```
 
 ---
