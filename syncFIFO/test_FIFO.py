@@ -35,7 +35,29 @@ async def reset(dut):
     dut.rst.value = 0
     await RisingEdge(dut.clk)
 
+@cocotb.test()
+async def fifo_basic_test(dut):
+    cocotb.start_soon(Clock(dut.clk, 1, unit="ns").start())
+    model = FifoModel(depth=4)
 
+    await reset(dut)
+
+    # Write then read using coroutines
+    await fifo_write(dut, 0xAB)
+    model.write(0xAB)
+    result = await fifo_read(dut)
+    model_result = model.read()
+
+    dut._log.info(f"dout = {result:#04x}")
+
+    assert result == model_result, (
+        f"Mismatch: DUT={result:#04x}, model={model_result:#04x}"
+    )
+
+    # Flag checks
+    assert dut.full.value  == model.full(),  "full flag mismatch"
+    assert dut.empty.value == model.empty(), "empty flag mismatch"
+    
 @cocotb.test()
 async def fifo_full_test(dut):
     """Write until full, verify full flag, ensure no overflow corruption."""
@@ -138,29 +160,25 @@ async def fifo_random_test(dut):
         assert dut.full.value  == model.full(),  "full flag mismatch"
         assert dut.empty.value == model.empty(), "empty flag mismatch"
 
-
 @cocotb.test()
-async def fifo_basic_test(dut):
+async def fifo_reset_midop_test(dut):
+    """Assert reset while FIFO has data — all state must clear."""
     cocotb.start_soon(Clock(dut.clk, 1, unit="ns").start())
     model = FifoModel(depth=4)
-
     await reset(dut)
 
-    # Write then read using coroutines
-    await fifo_write(dut, 0xAB)
-    model.write(0xAB)
-    result = await fifo_read(dut)
-    model_result = model.read()
+    for d in [0x11, 0x22, 0x33]:
+        await fifo_write(dut, d)
+        model.write(d)
 
-    dut._log.info(f"dout = {result:#04x}")
+    await reset(dut)                 # reuse the same coroutine mid-test
+    model = FifoModel(depth=4)
 
-    assert result == model_result, (
-        f"Mismatch: DUT={result:#04x}, model={model_result:#04x}"
-    )
+    assert dut.empty.value == 1, "not empty after mid-op reset"
+    assert dut.full.value  == 0, "full asserted after reset"
+    assert int(dut.dout.value) == 0, "dout not cleared after reset"
 
-    # Flag checks
-    assert dut.full.value  == model.full(),  "full flag mismatch"
-    assert dut.empty.value == model.empty(), "empty flag mismatch"
+
 
 
 @cocotb.test()

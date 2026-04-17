@@ -1,6 +1,11 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1776101569" />
-    <testcase name="fifo_basic_test" classname="test_FIFO" file="/mnt/c/Users/marpa/cocotb/syncFIFO/test_FIFO.py" lineno="29" time="0.001341104507446289" sim_time_ns="5.0" ratio_time="3728.2702222222224" />
+    <property name="random_seed" value="1776393716" />
+    <testcase name="fifo_basic_test" classname="test_FIFO" file="/mnt/c/Users/marpa/cocotb/syncFIFO/test_FIFO.py" lineno="38" time="0.0009915828704833984" sim_time_ns="5.0" ratio_time="5042.442894926665" />
+    <testcase name="fifo_full_test" classname="test_FIFO" file="/mnt/c/Users/marpa/cocotb/syncFIFO/test_FIFO.py" lineno="61" time="0.0012044906616210938" sim_time_ns="9.0" ratio_time="7472.038004750594" />
+    <testcase name="fifo_empty_test" classname="test_FIFO" file="/mnt/c/Users/marpa/cocotb/syncFIFO/test_FIFO.py" lineno="82" time="0.001978635787963867" sim_time_ns="17.0" ratio_time="8591.778286540548" />
+    <testcase name="fifo_concurrent_test" classname="test_FIFO" file="/mnt/c/Users/marpa/cocotb/syncFIFO/test_FIFO.py" lineno="105" time="0.0016179084777832031" sim_time_ns="9.0" ratio_time="5562.737400530504" />
+    <testcase name="fifo_random_test" classname="test_FIFO" file="/mnt/c/Users/marpa/cocotb/syncFIFO/test_FIFO.py" lineno="134" time="0.021815776824951172" sim_time_ns="307.0" ratio_time="14072.384516185439" />
+    <testcase name="fifo_reset_midop_test" classname="test_FIFO" file="/mnt/c/Users/marpa/cocotb/syncFIFO/test_FIFO.py" lineno="184" time="0.0022041797637939453" sim_time_ns="12.0" ratio_time="5444.202055164954" />
   </testsuite>
 </testsuites>
