@@ -105,6 +105,7 @@ make COCOTB_TEST_FILTER=fifo_full_test
 make COCOTB_TEST_FILTER=fifo_empty_test
 make COCOTB_TEST_FILTER=fifo_concurrent_test
 make COCOTB_TEST_FILTER=fifo_random_test
+make COCOTB_TEST_FILTER=fifo_reset_midop_test
 ```
 
 **Via Python runner / pytest:**
@@ -120,19 +121,20 @@ pytest test_FIFO.py::test_fifo_runner -k fifo_basic_test
 A full passing run looks like:
 
 ```
-351.00ns INFO     cocotb.regression                  *****************************************************************************************
-   351.00ns INFO     cocotb.regression                  *****************************************************************************************
+   359.00ns INFO     cocotb.regression                  *****************************************************************************************
                                                         ** TEST                             STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
                                                         *****************************************************************************************
-                                                        ** test_FIFO.fifo_full_test          PASS           8.00           0.00       7603.54  **
-                                                        ** test_FIFO.fifo_empty_test         PASS          17.00           0.00       7849.31  **
-                                                        ** test_FIFO.fifo_concurrent_test    PASS           9.00           0.00      10207.88  **
-                                                        ** test_FIFO.fifo_random_test        PASS         299.00           0.02      14448.79  **
-                                                        ** test_FIFO.fifo_basic_test         PASS           6.00           0.00       4193.61  **
-                                                        ** test_FIFO.fifo_reset_midop_test   PASS          12.00           0.00      12794.01  **
+                                                        ** test_FIFO.fifo_basic_test         PASS           5.00           0.00       5042.44  **
+                                                        ** test_FIFO.fifo_full_test          PASS           9.00           0.00       7472.04  **
+                                                        ** test_FIFO.fifo_empty_test         PASS          17.00           0.00       8591.78  **
+                                                        ** test_FIFO.fifo_concurrent_test    PASS           9.00           0.00       5562.74  **
+                                                        ** test_FIFO.fifo_random_test        PASS         307.00           0.02      14072.38  **
+                                                        ** test_FIFO.fifo_reset_midop_test   PASS          12.00           0.00       5444.20  **
                                                         *****************************************************************************************
-                                                        ** TESTS=6 PASS=6 FAIL=0 SKIP=0                   351.00           0.04       7888.66  **
+                                                        ** TESTS=6 PASS=6 FAIL=0 SKIP=0                   359.00           0.05       6742.53  **
                                                         *****************************************************************************************
+
+make[1]: Leaving directory '/mnt/c/Users/marpa/cocotb/syncFIFO'
 ```
 
 ---
