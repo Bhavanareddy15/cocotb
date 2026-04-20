@@ -1,0 +1,13 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1776715717" />
+    <testcase name="tc01_reset_correctness" classname="axi4_tb_top" file="/mnt/c/Users/marpa/cocotb/AXI4Lite/tb/axi4_tb_top.py" lineno="8" time="0.001558542251586914" sim_time_ns="10.0" ratio_time="6416.252103411351" />
+    <testcase name="tc02_idle_stability" classname="axi4_tb_top" file="/mnt/c/Users/marpa/cocotb/AXI4Lite/tb/axi4_tb_top.py" lineno="30" time="0.0011353492736816406" sim_time_ns="230.0" ratio_time="202580.83158336833" />
+    <testcase name="tc03_single_write" classname="axi4_tb_top" file="/mnt/c/Users/marpa/cocotb/AXI4Lite/tb/axi4_tb_top.py" lineno="40" time="0.0012822151184082031" sim_time_ns="100.0" ratio_time="77990.03346969133" />
+    <testcase name="tc04_single_read" classname="axi4_tb_top" file="/mnt/c/Users/marpa/cocotb/AXI4Lite/tb/axi4_tb_top.py" lineno="51" time="0.0019431114196777344" sim_time_ns="100.0" ratio_time="51463.8527607362" />
+    <testcase name="tc05_write_then_readback" classname="axi4_tb_top" file="/mnt/c/Users/marpa/cocotb/AXI4Lite/tb/axi4_tb_top.py" lineno="67" time="0.002830028533935547" sim_time_ns="170.0" ratio_time="60070.065711878684" />
+    <testcase name="tc07_write_all_registers" classname="axi4_tb_top" file="/mnt/c/Users/marpa/cocotb/AXI4Lite/tb/axi4_tb_top.py" lineno="78" time="0.015333890914916992" sim_time_ns="2270.0" ratio_time="148038.09500116613" />
+    <testcase name="tc08_read_all_registers" classname="axi4_tb_top" file="/mnt/c/Users/marpa/cocotb/AXI4Lite/tb/axi4_tb_top.py" lineno="99" time="0.016458511352539062" sim_time_ns="2280.0000000000005" ratio_time="138530.14717812033" />
+    <testcase name="tc09_back_to_back_writes" classname="axi4_tb_top" file="/mnt/c/Users/marpa/cocotb/AXI4Lite/tb/axi4_tb_top.py" lineno="122" time="0.009982824325561523" sim_time_ns="1150.0" ratio_time="115197.86009409853" />
+  </testsuite>
+</testsuites>
