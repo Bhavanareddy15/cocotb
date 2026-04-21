@@ -160,3 +160,183 @@ async def tc10_back_to_back_reads(dut):
             f"TC10 FAIL — register[{i}]: expected 0x{expected:08X}, got 0x{rdata:08X}"
 
     dut._log.info("TC10 PASS — 16 back-to-back reads completed correctly")
+
+@cocotb.test()
+async def tc11_data_patterns(dut):
+    """Write all-zeros, all-ones, and walking-ones patterns then read each back."""
+    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, unit="ns").start())
+    await reset_dut(dut,2)
+
+    # Build the pattern list: all-zeros, all-ones, then 32 walking-ones
+    patterns = [0x00000000, 0xFFFFFFFF] + [1 << i for i in range(32)]
+
+    # Use the first 32 register slots (one pattern per slot)
+    for addr, wdata in enumerate(patterns[:32]):
+        await axi_write(dut, addr=addr, data=wdata)
+        rdata = await axi_read(dut, addr=addr)
+        assert rdata == wdata, \
+            f"TC11 FAIL — pattern 0x{wdata:08X} at addr {addr}: got 0x{rdata:08X}"
+
+    dut._log.info("TC11 PASS — all data patterns verified correctly")
+
+
+@cocotb.test()
+async def tc12_address_boundaries(dut):
+    """Verify correct behavior at the lowest (0x00) and highest valid (0x1F) address."""
+    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, units="ns").start())
+    await reset_dut(dut,2)
+
+    boundary_vectors = [
+        (0x00, 0xDEADC0DE),   # lowest valid address
+        (0x1F, 0xBEEFCAFE),   # highest valid address (register 31)
+    ]
+
+    for addr, wdata in boundary_vectors:
+        await axi_write(dut, addr=addr, data=wdata)
+        rdata = await axi_read(dut, addr=addr)
+        assert rdata == wdata, \
+            f"TC12 FAIL — addr 0x{addr:02X}: expected 0x{wdata:08X}, got 0x{rdata:08X}"
+
+    # Also confirm neither boundary write corrupted the other
+    for addr, wdata in boundary_vectors:
+        actual = int(dut.u_axi4_lite_slave0.register[addr].value)
+        assert actual == wdata, \
+            f"TC12 FAIL — boundary corruption check: " \
+            f"register[0x{addr:02X}] = 0x{actual:08X}, expected 0x{wdata:08X}"
+
+    dut._log.info("TC12 PASS — address boundaries verified correctly")
+
+
+
+@cocotb.test()
+async def tc13_write_priority(dut):
+    """Assert both write_s and read_s simultaneously, confirm write wins."""
+    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, units="ns").start())
+    await reset_dut(dut,2)
+
+    # Pre-seed a register so a read would return a known value if it won
+    dut.u_axi4_lite_slave0.register[2].value = 0xDEADBEEF
+    await RisingEdge(dut.ACLK)
+
+    # Assert both simultaneously on the same rising edge
+    await RisingEdge(dut.ACLK)
+    dut.address.value = 0x02
+    dut.W_data.value  = 0x12345678
+    dut.write_s.value = 1
+    dut.read_s.value  = 1            # both asserted at the same time
+
+    await RisingEdge(dut.ACLK)
+    dut.write_s.value = 0
+    dut.read_s.value  = 0
+
+    # Give the FSM one extra cycle to register the start signals
+    await RisingEdge(dut.ACLK)
+    await RisingEdge(dut.ACLK)
+
+    # Master must enter WRITE_CHANNEL (1) or WRESP__CHANNEL (2), not RADDR_CHANNEL (3)
+    state = int(dut.u_axi4_lite_master0.state.value)
+    assert state in (1, 2), \
+        f"TC13 FAIL — expected write path (state 1 or 2), got state {state}"
+
+    # Wait for transaction to complete then confirm the write won
+    for _ in range(50):
+        await RisingEdge(dut.ACLK)
+        if int(dut.u_axi4_lite_master0.state.value) == 0:
+            break
+
+    actual = int(dut.u_axi4_lite_slave0.register[2].value)
+    assert actual == 0x12345678, \
+        f"TC13 FAIL — register[2]: expected 0x12345678, got 0x{actual:08X}"
+
+    dut._log.info("TC13 PASS — write correctly took priority over simultaneous read")
+
+
+@cocotb.test()
+async def tc14_reset_during_write(dut):
+    """Deassert ARESETN mid write-transaction, verify FSMs return to IDLE cleanly."""
+    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, units="ns").start())
+    await reset_dut(dut,2)
+
+    # Kick off a write transaction
+    await RisingEdge(dut.ACLK)
+    dut.address.value = 0x05
+    dut.W_data.value  = 0xBBBBBBBB
+    dut.write_s.value = 1
+
+    await RisingEdge(dut.ACLK)
+    await RisingEdge(dut.ACLK)
+    dut.write_s.value = 0
+
+    # Wait one cycle so the FSM has moved into WRITE_CHANNEL
+    await RisingEdge(dut.ACLK)
+    state = int(dut.u_axi4_lite_master0.state.value)
+    assert state != 0, \
+        f"TC14 FAIL — master never left IDLE, cannot test mid-transaction reset"
+
+    # Assert reset mid-transaction
+    dut.ARESETN.value = 0
+    await RisingEdge(dut.ACLK)
+    await RisingEdge(dut.ACLK)
+    dut.ARESETN.value = 1
+    await RisingEdge(dut.ACLK)
+
+    # Both FSMs must be back in IDLE
+    master_state = int(dut.u_axi4_lite_master0.state.value)
+    slave_state  = int(dut.u_axi4_lite_slave0.state.value)
+    assert master_state == 0, \
+        f"TC14 FAIL — master not in IDLE after reset, state={master_state}"
+    assert slave_state == 0, \
+        f"TC14 FAIL — slave not in IDLE after reset, state={slave_state}"
+
+    # All master output channels must be deasserted
+    assert int(dut.u_axi4_lite_master0.M_AWVALID.value) == 0, "TC14 FAIL — M_AWVALID still high"
+    assert int(dut.u_axi4_lite_master0.M_WVALID.value)  == 0, "TC14 FAIL — M_WVALID still high"
+    assert int(dut.u_axi4_lite_master0.M_BREADY.value)  == 0, "TC14 FAIL — M_BREADY still high"
+
+    dut._log.info("TC14 PASS — FSMs recovered cleanly from reset during write")
+
+@cocotb.test()
+async def tc15_reset_during_read(dut):
+    """Deassert ARESETN mid read-transaction, verify FSMs return to IDLE cleanly."""
+    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, units="ns").start())
+    await reset_dut(dut,2)
+
+    # Pre-seed a register so the read has something to fetch
+    dut.u_axi4_lite_slave0.register[3].value = 0xCCCCCCCC
+    await RisingEdge(dut.ACLK)
+
+    # Kick off a read transaction
+    await RisingEdge(dut.ACLK)
+    dut.address.value = 0x03
+    dut.read_s.value  = 1
+    await RisingEdge(dut.ACLK)
+    await RisingEdge(dut.ACLK)
+    dut.read_s.value  = 0
+
+    # Wait one cycle so the FSM has moved into RADDR_CHANNEL
+    await RisingEdge(dut.ACLK)
+    
+    state = int(dut.u_axi4_lite_master0.state.value)
+    assert state != 0, \
+        f"TC15 FAIL — master never left IDLE, cannot test mid-transaction reset"
+
+    # Assert reset mid-transaction
+    dut.ARESETN.value = 0
+    await RisingEdge(dut.ACLK)
+    await RisingEdge(dut.ACLK)
+    dut.ARESETN.value = 1
+    await RisingEdge(dut.ACLK)
+
+    # Both FSMs must be back in IDLE
+    master_state = int(dut.u_axi4_lite_master0.state.value)
+    slave_state  = int(dut.u_axi4_lite_slave0.state.value)
+    assert master_state == 0, \
+        f"TC15 FAIL — master not in IDLE after reset, state={master_state}"
+    assert slave_state == 0, \
+        f"TC15 FAIL — slave not in IDLE after reset, state={slave_state}"
+
+    # All master output channels must be deasserted
+    assert int(dut.u_axi4_lite_master0.M_ARVALID.value) == 0, "TC15 FAIL — M_ARVALID still high"
+    assert int(dut.u_axi4_lite_master0.M_RREADY.value)  == 0, "TC15 FAIL — M_RREADY still high"
+
+    dut._log.info("TC15 PASS — FSMs recovered cleanly from reset during read")
