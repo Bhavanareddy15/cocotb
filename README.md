@@ -54,15 +54,6 @@ Both methods produce the same result. See the README inside each project folder 
 
 ---
 
-## Projects
-
-| Folder | Design | Description |
-|---|---|---|
-| `simple_adder` | Combinational adder | Basic cocotb setup with combinational logic and a timer-based test |
-| `syncFIFO` | Synchronous FIFO | Clocked design with reset, write/read coroutines, and a Python reference model |
-
----
-
 ## Tools Used
 
 - **[cocotb](https://www.cocotb.org/)** — Python-based hardware verification framework
