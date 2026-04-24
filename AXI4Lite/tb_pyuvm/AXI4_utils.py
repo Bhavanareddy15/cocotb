@@ -16,6 +16,7 @@ class axi4_bfm(metaclass=Singleton):
         self.dut              = cocotb.top
         self.driv_queue       = Queue(maxsize=1)
         self.result_mon_queue = Queue(maxsize=0)
+        self.cmd_mon_queue = Queue(maxsize=0)
 
     # ------------------------------------------------------------------
     # Reset
@@ -42,6 +43,9 @@ class axi4_bfm(metaclass=Singleton):
 
     async def get_result(self):
         return await self.result_mon_queue.get()
+    
+    async def get_cmd(self):
+        return await self.cmd_mon_queue.get()
 
     # ------------------------------------------------------------------
     # Driver BFM
@@ -78,6 +82,29 @@ class axi4_bfm(metaclass=Singleton):
 
                 except QueueEmpty:
                     pass
+
+
+    # ------------------------------------------------------------------
+    # Command monitor BFM
+    # ------------------------------------------------------------------
+
+    async def command_mon_bfm(self):
+
+        prev_read_s  = 0
+        prev_write_s  = 0
+
+        while True:
+            await RisingEdge(self.dut.ACLK)
+            write_s = get_int(self.dut.write_s)
+            read_s  = get_int(self.dut.read_s)
+            if(write_s == 1 and prev_write_s ==0):
+                self.cmd_mon_queue.put_nowait(("write", get_int(self.dut.address),get_int(self.dut.W_data),))
+            elif(read_s == 1 and prev_read_s ==0):
+                self.cmd_mon_queue.put_nowait(("read", get_int(self.dut.address),0,))
+            
+            prev_read_s = read_s
+            prev_write_s = write_s
+
 
     # ------------------------------------------------------------------
     # Result monitor BFM
@@ -128,3 +155,4 @@ class axi4_bfm(metaclass=Singleton):
     def start_bfm(self):
         cocotb.start_soon(self.driver_bfm())
         cocotb.start_soon(self.result_mon_bfm())
+        cocotb.start_soon(self.command_mon_bfm())

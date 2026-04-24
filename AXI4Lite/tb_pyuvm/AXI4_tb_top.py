@@ -4,7 +4,9 @@ import cocotb
 import pyuvm
 from cocotb.clock import Clock
 
-from AXI4_utils import axi4_bfm
+from AXI4_utils import axi4_bfm, get_int
+
+from AXI4_model import AXI4LiteModel
 
 CLK_PERIOD = 10  # ns
 
@@ -126,9 +128,77 @@ class Driver(uvm_driver):
             self.ap.write(result)
             self.seq_item_port.item_done()
 
+# ---------------------------------------------------------------------------
+# Monitor
+# ---------------------------------------------------------------------------
+
+class Monitor(uvm_monitor):
+    def build_phase(self):
+        self.ap = uvm_analysis_port("ap", self)
+        self.bfm =  axi4_bfm()
+    
+    async def run_phase(self):
+        while True:
+            datum = await self.bfm.get_cmd()
+            self.ap.write(datum)
+# ---------------------------------------------------------------------------
+# Scoreboard 
+# ---------------------------------------------------------------------------
+
+class Scoreboard(uvm_scoreboard):
+    def build_phase(self):
+        self.cmd_fifo    = uvm_tlm_analysis_fifo("cmd_fifo",    self)
+        self.result_fifo = uvm_tlm_analysis_fifo("result_fifo", self)
+
+        self.cmd_get_port    = uvm_get_port("cmd_get_port",    self)
+        self.result_get_port = uvm_get_port("result_get_port", self)
+
+        self.cmd_export    = self.cmd_fifo.analysis_export
+        self.result_export = self.result_fifo.analysis_export
+
+        self.model = AXI4LiteModel()
+
+    def connect_phase(self):
+        self.cmd_get_port.connect(self.cmd_fifo.get_export)
+        self.result_get_port.connect(self.result_fifo.get_export)
+
+    def check_phase(self):
+        # comparison logic here
+        passed = True
+        while self.result_get_port.can_get():
+            _, actual = self.result_get_port.try_get()   # ← from result_fifo
+            cmd_ok , cmd    = self.cmd_get_port.try_get()       # ← from cmd_fifo
+
+            if not cmd_ok:
+                self.logger.critical("Result has no matching command")
+                continue
+
+            (txn_type, addr, data) =  cmd
+
+            if txn_type == "write":
+                self.model.write(addr, data)
+
+            elif txn_type == "read":
+                (_, _, actual_result) = actual
+                predicted = self.model.read(addr)
+                if predicted == actual_result:
+                    self.logger.info(
+                        f"PASSED READ addr=0x{addr:02X} "
+                        f"expected=0x{predicted:08X} got=0x{actual_result:08X}"
+                    )
+                else:
+                    self.logger.error(
+                        f"FAILED READ addr=0x{addr:02X} "
+                        f"expected=0x{predicted:08X} got=0x{actual_result:08X}"
+                    )
+                    passed = False
+        assert passed
+                
+
+
 
 # ---------------------------------------------------------------------------
-# Environment — driver only, no scoreboard yet
+# Environment
 # ---------------------------------------------------------------------------
 class AXIEnv(uvm_env):
 
@@ -136,9 +206,13 @@ class AXIEnv(uvm_env):
         self.seqr   = uvm_sequencer("seqr", self)
         ConfigDB().set(None, "*", "SEQR", self.seqr)
         self.driver = Driver.create("driver", self)
+        self.cmd_mon    = Monitor.create("cmd_mon", self)
+        self.scoreboard = Scoreboard("scoreboard", self)
 
     def connect_phase(self):
         self.driver.seq_item_port.connect(self.seqr.seq_item_export)
+        self.cmd_mon.ap.connect(self.scoreboard.cmd_export)      # cmd flow
+        self.driver.ap.connect(self.scoreboard.result_export)    # result flow
 
 
 # ---------------------------------------------------------------------------

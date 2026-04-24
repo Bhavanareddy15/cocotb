@@ -1,6 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1776971431" />
-    <testcase name="WriteReadBackTest" classname="AXI4_tb_top" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="147" time="0.008162260055541992" sim_time_ns="580.0" ratio_time="71058.75040163576" />
+    <property name="random_seed" value="1777012978" />
+    <testcase name="WriteReadBackTest" classname="AXI4_tb_top" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="221" time="0.03311491012573242" sim_time_ns="580.0" ratio_time="17514.768960502253" />
   </testsuite>
 </testsuites>
