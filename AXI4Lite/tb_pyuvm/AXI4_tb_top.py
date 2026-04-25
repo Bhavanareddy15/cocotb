@@ -8,8 +8,59 @@ from AXI4_utils import axi4_bfm, get_int
 
 from AXI4_model import AXI4LiteModel
 
+from cocotb_coverage.coverage import CoverPoint, CoverCross, CoverageDB, coverage_section, coverage_db
+
 CLK_PERIOD = 10  # ns
 
+# ---------------------------------------------------------------------------
+# Coverage model as a section
+# ---------------------------------------------------------------------------
+
+AXICoverage = coverage_section(
+
+    # Coverpoint 1 — transaction type
+    # Equivalent SV: coverpoint txn_type { bins WRITE={0}; bins READ={1}; }
+    CoverPoint(
+        "axi.txn_type",
+        vname="txn_type",
+        bins=["write", "read"],
+        bins_labels=["WRITE", "READ"]
+    ),
+
+    # Coverpoint 2 — address range bins
+    # Equivalent SV:
+    # coverpoint addr {
+    #   bins low  = {[0:7]};
+    #   bins mid  = {[8:23]};
+    #   bins high = {[24:31]};
+    # }
+    CoverPoint(
+        "axi.addr_range",
+        vname="addr",
+        rel=lambda val_, bin_: bin_[0] <= val_ <= bin_[1],
+        bins=[(0, 7), (8, 23), (24, 31)],
+        bins_labels=["low", "mid", "high"]
+    ),
+
+    # Coverpoint 3 — exact boundary addresses
+    CoverPoint(
+        "axi.addr_boundary",
+        vname="addr",
+        bins=[0, 31],
+        bins_labels=["addr_min", "addr_max"]
+    ),
+
+    # Cross coverage — txn_type x addr_range
+    # Equivalent SV: cross txn_type, addr_range;
+    CoverCross(
+        "axi.txn_x_addr",
+        items=["axi.txn_type", "axi.addr_range"]
+    ),
+)
+
+@AXICoverage
+def sample_coverage(txn_type, addr):
+    pass   # body empty — decorator does the work
 
 # ---------------------------------------------------------------------------
 # Sequence items
@@ -81,6 +132,33 @@ class WriteReadBackSeq(uvm_sequence):
         await self.start_item(read_item)
         await self.finish_item(read_item)
 
+class RandomWriteReadSeq(uvm_sequence):
+    def __init__(self, name, count=10):
+        super().__init__(name)
+        self.count   = count
+        self.written = []
+
+    async def body(self):
+        seqr = ConfigDB().get(None, "", "SEQR")
+
+        # Write phase — track which addresses were used
+        for _ in range(self.count):
+            item = AXIWriteSeqItem("write_item")
+            await self.start_item(item)
+            item.randomize()
+            self.written.append((item.addr, item.data))  # ← track here
+            await self.finish_item(item)
+
+        # Read phase — only read addresses that were written
+        for addr, _ in self.written:
+            item = AXIReadSeqItem("read_item", addr)     # ← use tracked addr
+            await self.start_item(item)
+            await self.finish_item(item)                 # no randomize needed
+
+
+
+
+
 
 # ---------------------------------------------------------------------------
 # Driver
@@ -124,6 +202,9 @@ class Driver(uvm_driver):
                 self.logger.info(
                     f"READ  completed — addr=0x{addr:02X} result=0x{data:08X}"
                 )
+
+            # Sample coverage every transaction
+            sample_coverage(txn_type, addr)
 
             self.ap.write(result)
             self.seq_item_port.item_done()
@@ -213,6 +294,22 @@ class AXIEnv(uvm_env):
         self.driver.seq_item_port.connect(self.seqr.seq_item_export)
         self.cmd_mon.ap.connect(self.scoreboard.cmd_export)      # cmd flow
         self.driver.ap.connect(self.scoreboard.result_export)    # result flow
+    
+    def report_phase(self):
+        self.logger.info("=" * 50)
+        self.logger.info("COVERAGE REPORT")
+        self.logger.info("=" * 50)
+
+        for name, item in coverage_db.items():
+            self.logger.info(
+                f"{name:40s}  {item.coverage:>4}/{item.size:<4} "
+                f"({item.cover_percentage:6.1f}%)" )
+
+        overall = coverage_db["axi"].cover_percentage
+        self.logger.info("=" * 50)
+        self.logger.info(f"Overall: {overall:.1f}%")
+        self.logger.info("=" * 50)
+        
 
 
 # ---------------------------------------------------------------------------
@@ -227,7 +324,7 @@ class WriteReadBackTest(uvm_test):
 
     def start_of_simulation_phase(self):
         cocotb.start_soon(
-            Clock(cocotb.top.ACLK, CLK_PERIOD, units="ns").start()
+            Clock(cocotb.top.ACLK, CLK_PERIOD, unit="ns").start()
         )
 
     async def run_phase(self):
@@ -246,4 +343,25 @@ class WriteReadBackTest(uvm_test):
             self.logger.info(f"--- Sending WRITE addr=0x{addr:02X} data=0x{data:08X} ---")
             await WriteReadBackSeq("wrb", addr, data).start(seqr)
 
+        self.drop_objection()
+
+# ---------------------------------------------------------------------------
+# Test — write then read back random addresses 
+# ---------------------------------------------------------------------------
+@pyuvm.test()
+class RandomWriteReadBackTest(uvm_test):
+    """Write then immediately read back — print results for manual confirmation."""
+
+    def build_phase(self):
+        self.env = AXIEnv("env", self)
+
+    def start_of_simulation_phase(self):
+        cocotb.start_soon(
+            Clock(cocotb.top.ACLK, CLK_PERIOD, unit="ns").start()
+        )
+
+    async def run_phase(self):
+        self.raise_objection()
+        seqr = ConfigDB().get(None, "", "SEQR")
+        await RandomWriteReadSeq("rand_wr", count=10).start(seqr)
         self.drop_objection()
