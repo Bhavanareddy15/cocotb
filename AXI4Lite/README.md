@@ -4,26 +4,6 @@ A complete verification environment for an AXI4-Lite master/slave design, built 
 
 ---
 
-## Project Structure
-
-```
-AXI4Lite/
-├── design/
-│   ├── axi4_lite_master.sv   # AXI4-Lite master FSM
-│   ├── axi4_lite_slave.sv    # AXI4-Lite slave FSM with 32x32-bit register file
-│   └── axi4_lite_top.sv      # Top-level wrapper
-├── tb/                        # Directed cocotb testbench
-│   ├── Makefile
-│   ├── axi4_bfm.py            # BFM helpers for write and read transactions
-│   └── axi4_tb_top.py         # 15 directed test cases
-└── tb_pyuvm/                  # UVM testbench
-    ├── Makefile
-    ├── AXI4_utils.py          # BFM with driver and result monitor
-    └── AXI4_tb_top.py         # pyuvm environment with scoreboard and coverage
-```
-
----
-
 ## tb — Directed Testbench
 
 Contains 15 directed test cases written in cocotb covering:
