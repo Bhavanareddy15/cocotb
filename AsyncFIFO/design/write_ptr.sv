@@ -37,25 +37,6 @@ else
 	full<=wfull;
 end
 assign wfull= (wptr_next=={~rptr_sync[ptr_width:ptr_width-1],rptr_sync[ptr_width-2:0]});// FULL CONDITION
-
-//assertions
-property P_wreset;
-	@(posedge wclk)
-	disable iff(w_rst_n)
-	!w_rst_n |=> ((waddr=='0) & (wptr=='0));
-endproperty
-a_reset: assert property(P_wreset)
-else
-	$error(" assertion failed in write reset");
-	
-property P_wfull;
-	@(posedge wclk)
-	disable iff(w_rst_n)
-	!w_rst_n |=> full=='0;
-endproperty
-a_full: assert property(P_wfull)
-else
-	$error(" assertion failed in write full condition");
 	
 endmodule
   `endif

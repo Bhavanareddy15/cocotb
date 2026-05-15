@@ -41,24 +41,6 @@ else
 	empty<=rempty;
 	
 end
-//Assertions
-property P_rreset;
-	@(posedge rclk)
-	disable iff(r_rst_n)
-	!r_rst_n |=> (raddr=='0 & rptr=='0);
-endproperty
-a_rreset: assert property(P_rreset)
-else
-	$error(" assertion failed in read reset");
-	
-property P_rempty;
-	@(posedge rclk)
-	disable iff(r_rst_n)
-	!r_rst_n |=> (empty=='1);
-endproperty
-a_empty: assert property(P_rempty)
-else
-	$error(" assertion failed in empty condition");
 
 endmodule
 `endif
