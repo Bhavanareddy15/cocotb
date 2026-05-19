@@ -1,35 +1,93 @@
 // Code your design here
-`include "intfc.sv"
 // Synchronizers
-`include "w2rsync.sv"
-`include "r2wsync.sv"
+`include "../design/w2rsync.sv"
+`include "../design/r2wsync.sv"
 
 // Pointer handlers
-`include "write_ptr.sv"
-`include "read_ptr.sv"
+`include "../design/write_ptr.sv"
+`include "../design/read_ptr.sv"
 
 // Memory
-`include "fifo_mem.sv"
+`include "../design/fifo_mem.sv"
 
-module top #(parameter depth=409, data_width=8,ptr_width=9) (intfc i1 );
+module top #(parameter depth=409, data_width=8, ptr_width=9) (
+    input  logic                  wclk,
+    input  logic                  w_rst_n,
+    input  logic                  rclk,
+    input  logic                  r_rst_n,
+    input  logic                  w_en,
+    input  logic                  r_en,
+    input  logic [data_width-1:0] data_in,
+    output logic [data_width-1:0] data_out,
+    output logic                  full,
+    output logic                  empty
+);
 
+    // Internal signals
+    logic [ptr_width-1:0] wptr;
+    logic [ptr_width-1:0] rptr;
+    logic [ptr_width-1:0] wptr_sync;
+    logic [ptr_width-1:0] rptr_sync;
+    logic [ptr_width-1:0] waddr;
+    logic [ptr_width-1:0] raddr;
 
-//2 flop sunchronizers
-w2rsync #(ptr_width) w2rsync_inst(i1.rclk,  i1.r_rst_n,  i1.wptr ,  i1.wptr_sync );
-r2wsync #(ptr_width) r2wsync_inst(i1.wclk, i1.w_rst_n, i1.rptr,  i1.rptr_sync );
+    // 2-flop synchronizers
+    w2rsync #(ptr_width) w2rsync_inst (
+        .rclk     (rclk),
+        .r_rst_n  (r_rst_n),
+        .wptr     (wptr),
+        .wptr_sync(wptr_sync)
+    );
 
-//write point handler
-write_ptr #(ptr_width) write_ptr_inst (i1.wclk, i1.w_rst_n, i1.w_en,  i1.rptr_sync,  i1.waddr, i1.wptr, i1.full);
+    r2wsync #(ptr_width) r2wsync_inst (
+        .wclk     (wclk),
+        .w_rst_n  (w_rst_n),
+        .rptr     (rptr),
+        .rptr_sync(rptr_sync)
+    );
 
-//read point handler
-read_ptr #(ptr_width) read_ptr_inst (i1.rclk, i1.r_rst_n, i1.r_en,   i1.wptr_sync,  i1.raddr, i1.rptr,  i1.empty);
+    // Write pointer handler
+    write_ptr #(ptr_width) write_ptr_inst (
+        .wclk      (wclk),
+        .w_rst_n   (w_rst_n),
+        .w_en      (w_en),
+        .rptr_sync (rptr_sync),
+        .waddr     (waddr),
+        .wptr      (wptr),
+        .full      (full)
+    );
 
-//fifo memory
-fifo_mem #(data_width,ptr_width,depth) fifo_mem_inst (i1.wclk,i1.rclk,i1.r_rst_n,i1.w_rst_n,i1.w_en,i1.r_en,i1.full,i1.empty, i1.data_in,  i1.waddr,i1.raddr,  i1.data_out);
+    // Read pointer handler
+    read_ptr #(ptr_width) read_ptr_inst (
+        .rclk      (rclk),
+        .r_rst_n   (r_rst_n),
+        .r_en      (r_en),
+        .wptr_sync (wptr_sync),
+        .raddr     (raddr),
+        .rptr      (rptr),
+        .empty     (empty)
+    );
 
-  // Dump waves
-initial begin
-    $dumpfile("dump.vcd");
-  $dumpvars(0, top);
-end
+    // FIFO memory
+    fifo_mem #(data_width, ptr_width, depth) fifo_mem_inst (
+        .wclk    (wclk),
+        .rclk    (rclk),
+        .r_rst_n (r_rst_n),
+        .w_rst_n (w_rst_n),
+        .w_en    (w_en),
+        .r_en    (r_en),
+        .full    (full),
+        .empty   (empty),
+        .data_in (data_in),
+        .waddr   (waddr),
+        .raddr   (raddr),
+        .data_out(data_out)
+    );
+
+    // Dump waves
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, top);
+    end
+
 endmodule

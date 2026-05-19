@@ -4,14 +4,14 @@
 module write_ptr #(parameter ptr_width=9)(wclk, w_rst_n, w_en,  rptr_sync,  waddr, wptr, full);
 
 input bit wclk, w_rst_n, w_en;
-input logic [ptr_width:0] rptr_sync;
+input logic [ptr_width-1:0] rptr_sync;
 
 output bit full;
-output logic [ptr_width:0] waddr, wptr;
+output logic [ptr_width-1:0] waddr, wptr;
 
 logic wfull;
-logic [ptr_width:0]waddr_next; 
-logic [ptr_width:0]wptr_next;
+logic [ptr_width-1:0]waddr_next; 
+logic [ptr_width-1:0]wptr_next;
 
 assign waddr_next= waddr + (w_en & !full);
 assign wptr_next= (waddr_next>>1)^waddr_next; 

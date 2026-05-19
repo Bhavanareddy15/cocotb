@@ -1,19 +1,19 @@
 `ifndef READ_PTR_SV
 `define READ_PTR_SV
 
-module read_ptr #(parameter ptr_width=8)( rclk, r_rst_n, r_en,   wptr_sync,  raddr, rptr,  empty);
+module read_ptr #(parameter ptr_width=9)( rclk, r_rst_n, r_en,   wptr_sync,  raddr, rptr,  empty);
 
 input bit rclk,r_rst_n, r_en;
-input logic [ptr_width:0]  wptr_sync;
+input logic [ptr_width-1:0]  wptr_sync;
 output bit empty;
-output logic [ptr_width:0] raddr, rptr;
+output logic [ptr_width-1:0] raddr, rptr;
 
  logic rempty;
  logic emptyr;
  logic readempty;
 
-logic [ptr_width:0]raddr_next;
-logic [ptr_width:0]rptr_next;
+logic [ptr_width-1:0]raddr_next;
+logic [ptr_width-1:0]rptr_next;
 
 
 assign raddr_next= raddr + (r_en & !empty);
