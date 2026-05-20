@@ -1,6 +1,6 @@
 from pyuvm import uvm_agent, uvm_sequencer, uvm_analysis_port
-from .write_driver  import FifoWriteDriver
-from .write_monitor import FifoWriteMonitor
+from write_driver  import FifoWriteDriver
+from write_monitor import FifoWriteMonitor
  
  
 class FifoWriteAgent(uvm_agent):

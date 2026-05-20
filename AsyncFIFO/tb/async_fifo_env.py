@@ -1,8 +1,8 @@
 from pyuvm import uvm_env
-from .write_agent import FifoWriteAgent
-from .read_agent  import FifoReadAgent
-from .scoreboard  import FifoScoreboard
-from .coverage    import FifoCoverage
+from write_agent import FifoWriteAgent
+from read_agent  import FifoReadAgent
+#from scoreboard  import FifoScoreboard
+#from coverage    import FifoCoverage
  
  
 class FifoEnv(uvm_env):

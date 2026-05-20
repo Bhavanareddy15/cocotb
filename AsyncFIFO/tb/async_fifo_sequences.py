@@ -1,6 +1,6 @@
 import pyuvm
 from pyuvm import *
-from .async_fifo_seq_item import FifoWriteItem, FifoReadItem
+from async_fifo_seq_item import FifoWriteItem, FifoReadItem
 import random
 
 

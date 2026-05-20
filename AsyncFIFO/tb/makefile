@@ -41,7 +41,7 @@ ifeq ($(SIM),verilator)
   COMPILE_ARGS += -I$(DESIGN_DIR)
 endif
 # Python test module (relative to PYTHONPATH root)
-MODULE = tb.tests.test_async_fifo
+COCOTB_TEST_MODULES = test_async_fifo
 
 # Single-test shortcut
 ifdef TEST

@@ -1,12 +1,13 @@
 import cocotb
 from cocotb.triggers import RisingEdge, Timer, ClockCycles
 from cocotb.clock    import Clock
-from pyuvm import uvm_test, pyuvm_test
+import pyuvm
+from pyuvm import uvm_test
  
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
  
-from tb.components.env import FifoEnv
+from async_fifo_env import FifoEnv
  
  
 # ─────────────────────────────────────────────────────────────────────────────
@@ -70,7 +71,7 @@ class AsyncFifoBase(uvm_test):
 # Test 1 — Reset
 # ─────────────────────────────────────────────────────────────────────────────
  
-@pyuvm_test()
+@pyuvm.test()
 class TestReset(AsyncFifoBase):
     async def do_test(self, dut):
         await Timer(1, "step")

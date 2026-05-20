@@ -1,6 +1,6 @@
 from pyuvm import uvm_agent, uvm_sequencer, uvm_analysis_port
-from .read_driver  import FifoReadDriver
-from .read_monitor import FifoReadMonitor
+from read_driver  import FifoReadDriver
+from read_monitor import FifoReadMonitor
  
  
 class FifoReadAgent(uvm_agent):

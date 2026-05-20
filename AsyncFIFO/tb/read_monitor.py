@@ -1,7 +1,7 @@
 import cocotb
 from cocotb.triggers import RisingEdge, Timer
 from pyuvm import uvm_component, uvm_analysis_port
-from ..sequences.async_fifo_seq_item import FifoReadItem
+from async_fifo_seq_item import FifoReadItem
  
  
 class FifoReadMonitor(uvm_component):
