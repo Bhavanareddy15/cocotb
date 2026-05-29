@@ -122,7 +122,7 @@ async def tc08_read_all_registers(dut):
 @cocotb.test()
 async def tc09_back_to_back_writes(dut):
     """Fire 16 consecutive writes with no gap between transactions."""
-    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, units="ns").start())
+    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, unit="ns").start())
     await reset_dut(dut,2)
 
     # Write 16 consecutive transactions back-to-back
@@ -142,7 +142,7 @@ async def tc09_back_to_back_writes(dut):
 @cocotb.test()
 async def tc10_back_to_back_reads(dut):
     """Fire 16 consecutive reads with no gap between transactions."""
-    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, units="ns").start())
+    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, unit="ns").start())
     await reset_dut(dut,2)
 
     # Pre-seed 16 registers directly
@@ -183,7 +183,7 @@ async def tc11_data_patterns(dut):
 @cocotb.test()
 async def tc12_address_boundaries(dut):
     """Verify correct behavior at the lowest (0x00) and highest valid (0x1F) address."""
-    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, units="ns").start())
+    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, unit="ns").start())
     await reset_dut(dut,2)
 
     boundary_vectors = [
@@ -211,7 +211,7 @@ async def tc12_address_boundaries(dut):
 @cocotb.test()
 async def tc13_write_priority(dut):
     """Assert both write_s and read_s simultaneously, confirm write wins."""
-    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, units="ns").start())
+    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, unit="ns").start())
     await reset_dut(dut,2)
 
     # Pre-seed a register so a read would return a known value if it won
@@ -298,7 +298,7 @@ async def tc14_reset_during_write(dut):
 @cocotb.test()
 async def tc15_reset_during_read(dut):
     """Deassert ARESETN mid read-transaction, verify FSMs return to IDLE cleanly."""
-    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, units="ns").start())
+    cocotb.start_soon(Clock(dut.ACLK, CLK_PERIOD, unit="ns").start())
     await reset_dut(dut,2)
 
     # Pre-seed a register so the read has something to fetch

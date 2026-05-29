@@ -1,8 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1779256750" />
-    <testcase name="TestReset" classname="test_async_fifo" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="74" time="0.0065844058990478516" sim_time_ns="0.0" ratio_time="0.0">
-      <failure error_type="NameError" error_msg="name 'FifoScoreboard' is not defined" />
-    </testcase>
-  </testsuite>
-</testsuites>
