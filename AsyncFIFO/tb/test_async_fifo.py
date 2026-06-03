@@ -3,9 +3,10 @@ from cocotb.triggers import RisingEdge, Timer, ClockCycles
 from cocotb.clock    import Clock
 import pyuvm
 from pyuvm import uvm_test
+
+from async_fifo_sequences import FifoReadSeq, FifoWriteSeq
  
 import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
  
 from async_fifo_env import FifoEnv
  
@@ -15,8 +16,8 @@ from async_fifo_env import FifoEnv
 # ─────────────────────────────────────────────────────────────────────────────
  
 async def start_clocks(dut):
-    cocotb.start_soon(Clock(dut.wclk, 8,  units="ns").start())
-    cocotb.start_soon(Clock(dut.rclk, 20, units="ns").start())
+    cocotb.start_soon(Clock(dut.wclk, 8,  unit="ns").start())
+    cocotb.start_soon(Clock(dut.rclk, 20, unit="ns").start())
  
  
 async def apply_reset(dut, cycles=5):
@@ -30,20 +31,7 @@ async def apply_reset(dut, cycles=5):
     dut.r_rst_n.value = 1
     await ClockCycles(dut.wclk, 2)
  
- 
-async def drive_write(dut, data: int):
-    await RisingEdge(dut.wclk)
-    dut.w_en.value    = 1
-    dut.data_in.value = data & 0xFF
-    await RisingEdge(dut.wclk)
-    dut.w_en.value = 0
- 
- 
-async def drive_read(dut):
-    await RisingEdge(dut.rclk)
-    dut.r_en.value = 1
-    await RisingEdge(dut.rclk)
-    dut.r_en.value = 0
+
  
  
 # ─────────────────────────────────────────────────────────────────────────────
@@ -64,7 +52,8 @@ class AsyncFifoBase(uvm_test):
         self.drop_objection()
  
     async def do_test(self, dut):
-        pass
+        cocotb.start_soon(FifoReadSeq.start(self.env.write_agent.seqr))
+        await FifoReadSeq.start(self.env.read_agent.seqr)
  
  
 # ─────────────────────────────────────────────────────────────────────────────
@@ -78,11 +67,14 @@ class TestReset(AsyncFifoBase):
         assert int(dut.empty.value) == 1, "empty must be 1 after reset"
         assert int(dut.full.value)  == 0, "full must be 0 after reset"
         self.logger.info("Initial flags OK: empty=1, full=0")
- 
-        for d in range(5):
-            await drive_write(dut, d)
+
+        # write some data using the sequencer
+        write_seq       = FifoWriteSeq("write_seq")
+        write_seq.count = 5
+        await write_seq.start(self.env.write_agent.seqr)
         await ClockCycles(dut.wclk, 4)
- 
+
+        # mid-sim reset
         dut.w_rst_n.value = 0
         dut.r_rst_n.value = 0
         await ClockCycles(dut.wclk, 4)

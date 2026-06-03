@@ -1,7 +1,7 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1777067666" />
-    <testcase name="WriteReadBackTest" classname="AXI4_tb_top" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="318" time="0.017260074615478516" sim_time_ns="580.0" ratio_time="33603.56272619278" />
-    <testcase name="RandomWriteReadBackTest" classname="AXI4_tb_top" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="351" time="0.019848108291625977" sim_time_ns="1430.0" ratio_time="72047.16837439488" />
+    <property name="random_seed" value="1780513071" />
+    <testcase name="WriteReadBackTest" classname="AXI4_tb_top" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="318" time="0.011425971984863281" sim_time_ns="580.0" ratio_time="50761.54578081963" />
+    <testcase name="RandomWriteReadBackTest" classname="AXI4_tb_top" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="351" time="0.016791582107543945" sim_time_ns="1430.0" ratio_time="85161.71917817944" />
   </testsuite>
 </testsuites>

@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1780514414" />
+    <testcase name="TestReset" classname="test_async_fifo" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="63" time="0.014066696166992188" sim_time_ns="432.0" ratio_time="30710.83606779661" />
+  </testsuite>
+</testsuites>

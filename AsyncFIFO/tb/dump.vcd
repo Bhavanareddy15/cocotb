@@ -1,0 +1,1047 @@
+$date
+	Wed Jun  3 12:20:14 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module top $end
+$var wire 8 ! data_in [7:0] $end
+$var wire 1 " r_en $end
+$var wire 1 # r_rst_n $end
+$var wire 1 $ rclk $end
+$var wire 1 % w_en $end
+$var wire 1 & w_rst_n $end
+$var wire 1 ' wclk $end
+$var wire 9 ( wptr_sync [8:0] $end
+$var wire 9 ) wptr [8:0] $end
+$var wire 9 * waddr [8:0] $end
+$var wire 9 + rptr_sync [8:0] $end
+$var wire 9 , rptr [8:0] $end
+$var wire 9 - raddr [8:0] $end
+$var wire 1 . full $end
+$var wire 1 / empty $end
+$var wire 8 0 data_out [7:0] $end
+$var parameter 32 1 data_width $end
+$var parameter 32 2 depth $end
+$var parameter 32 3 ptr_width $end
+$scope module fifo_mem_inst $end
+$var wire 8 4 data_in [7:0] $end
+$var wire 8 5 data_out [7:0] $end
+$var wire 1 6 empty $end
+$var wire 1 7 full $end
+$var wire 1 8 r_en $end
+$var wire 1 9 r_rst_n $end
+$var wire 1 : rclk $end
+$var wire 1 ; w_en $end
+$var wire 1 < w_rst_n $end
+$var wire 1 = wclk $end
+$var wire 9 > waddr [8:0] $end
+$var wire 9 ? raddr [8:0] $end
+$var parameter 32 @ data_width $end
+$var parameter 32 A depth $end
+$var parameter 32 B ptr_width $end
+$upscope $end
+$scope module r2wsync_inst $end
+$var wire 1 C w_rst_n $end
+$var wire 1 D wclk $end
+$var wire 9 E rptr [8:0] $end
+$var parameter 32 F ptr_width $end
+$var reg 10 G q1 [9:0] $end
+$var reg 9 H rptr_sync [8:0] $end
+$upscope $end
+$scope module read_ptr_inst $end
+$var wire 1 I r_en $end
+$var wire 1 J r_rst_n $end
+$var wire 1 K rclk $end
+$var wire 9 L rptr_next [8:0] $end
+$var wire 9 M wptr_sync [8:0] $end
+$var wire 1 N rempty $end
+$var wire 9 O raddr_next [8:0] $end
+$var parameter 32 P ptr_width $end
+$var reg 9 Q raddr [8:0] $end
+$var reg 9 R rptr [8:0] $end
+$var reg 1 / empty $end
+$upscope $end
+$scope module w2rsync_inst $end
+$var wire 1 S r_rst_n $end
+$var wire 1 T rclk $end
+$var wire 9 U wptr [8:0] $end
+$var parameter 32 V ptr_width $end
+$var reg 10 W q2 [9:0] $end
+$var reg 9 X wptr_sync [8:0] $end
+$upscope $end
+$scope module write_ptr_inst $end
+$var wire 9 Y rptr_sync [8:0] $end
+$var wire 1 Z w_en $end
+$var wire 1 [ w_rst_n $end
+$var wire 1 \ wclk $end
+$var wire 9 ] wptr_next [8:0] $end
+$var wire 1 ^ wfull $end
+$var wire 9 _ waddr_next [8:0] $end
+$var parameter 32 ` ptr_width $end
+$var reg 9 a waddr [8:0] $end
+$var reg 9 b wptr [8:0] $end
+$var reg 1 . full $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b1001 `
+b1001 V
+b1001 P
+b1001 F
+b1001 B
+b110011001 A
+b1000 @
+b1001 3
+b110011001 2
+b1000 1
+$end
+#0
+$dumpvars
+b0 b
+b0 a
+b0 _
+0^
+b0 ]
+1\
+0[
+0Z
+b0 Y
+b0 X
+b0 W
+b0 U
+1T
+0S
+b0 R
+b0 Q
+b0 O
+1N
+b0 M
+b0 L
+1K
+0J
+0I
+b0 H
+b0 G
+b0 E
+1D
+0C
+b0 ?
+b0 >
+1=
+0<
+0;
+1:
+09
+08
+07
+16
+bx 5
+b0 4
+bx 0
+1/
+0.
+b0 -
+b0 ,
+b0 +
+b0 *
+b0 )
+b0 (
+1'
+0&
+0%
+1$
+0#
+0"
+b0 !
+$end
+#4000
+0D
+0\
+0=
+0'
+#8000
+1D
+1\
+1=
+1'
+#10000
+0T
+0K
+0:
+0$
+#12000
+0D
+0\
+0=
+0'
+#16000
+1D
+1\
+1=
+1'
+#20000
+0D
+0\
+0=
+0'
+1T
+1K
+1:
+1$
+#24000
+1D
+1\
+1=
+1'
+#28000
+0D
+0\
+0=
+0'
+#30000
+0T
+0K
+0:
+0$
+#32000
+1S
+1J
+19
+1#
+1C
+1[
+1<
+1&
+1D
+1\
+1=
+1'
+#36000
+0D
+0\
+0=
+0'
+#40000
+1D
+1\
+1=
+1'
+1T
+1K
+1:
+1$
+#44000
+0D
+0\
+0=
+0'
+#48000
+1D
+1\
+1=
+1'
+#50000
+0T
+0K
+0:
+0$
+#52000
+0D
+0\
+0=
+0'
+#56000
+b1 ]
+b1 _
+b11110001 !
+b11110001 4
+1Z
+1;
+1%
+1D
+1\
+1=
+1'
+#60000
+0D
+0\
+0=
+0'
+1T
+1K
+1:
+1$
+#64000
+0Z
+0;
+0%
+b1 ]
+b1 )
+b1 U
+b1 b
+b1 _
+b1 *
+b1 >
+b1 a
+b11110001 0
+b11110001 5
+1D
+1\
+1=
+1'
+#68000
+0D
+0\
+0=
+0'
+#70000
+0T
+0K
+0:
+0$
+#72000
+b11 ]
+b10 _
+b1010110 !
+b1010110 4
+1Z
+1;
+1%
+1D
+1\
+1=
+1'
+#76000
+0D
+0\
+0=
+0'
+#80000
+0Z
+0;
+0%
+b11 ]
+b11 )
+b11 U
+b11 b
+b10 _
+b10 *
+b10 >
+b10 a
+b1 W
+1D
+1\
+1=
+1'
+1T
+1K
+1:
+1$
+#84000
+0D
+0\
+0=
+0'
+#88000
+b10 ]
+b11 _
+b11011100 !
+b11011100 4
+1Z
+1;
+1%
+1D
+1\
+1=
+1'
+#90000
+0T
+0K
+0:
+0$
+#92000
+0D
+0\
+0=
+0'
+#96000
+0Z
+0;
+0%
+b10 ]
+b10 )
+b10 U
+b10 b
+b11 _
+b11 *
+b11 >
+b11 a
+1D
+1\
+1=
+1'
+#100000
+0N
+b1 (
+b1 M
+b1 X
+b10 W
+0D
+0\
+0=
+0'
+1T
+1K
+1:
+1$
+#104000
+b110 ]
+b100 _
+b11111011 !
+b11111011 4
+1Z
+1;
+1%
+1D
+1\
+1=
+1'
+#108000
+0D
+0\
+0=
+0'
+#110000
+0T
+0K
+0:
+0$
+#112000
+0Z
+0;
+0%
+b110 ]
+b110 )
+b110 U
+b110 b
+b100 _
+b100 *
+b100 >
+b100 a
+1D
+1\
+1=
+1'
+#116000
+0D
+0\
+0=
+0'
+#120000
+b111 ]
+b101 _
+b101001 !
+b101001 4
+1Z
+1;
+1%
+b10 (
+b10 M
+b10 X
+b110 W
+06
+0/
+1D
+1\
+1=
+1'
+1T
+1K
+1:
+1$
+#124000
+0D
+0\
+0=
+0'
+#128000
+0Z
+0;
+0%
+b111 ]
+b111 )
+b111 U
+b111 b
+b101 _
+b101 *
+b101 >
+b101 a
+1D
+1\
+1=
+1'
+#130000
+0T
+0K
+0:
+0$
+#132000
+0D
+0\
+0=
+0'
+#136000
+1D
+1\
+1=
+1'
+#140000
+b110 (
+b110 M
+b110 X
+b111 W
+0D
+0\
+0=
+0'
+1T
+1K
+1:
+1$
+#144000
+1D
+1\
+1=
+1'
+#148000
+0D
+0\
+0=
+0'
+#150000
+0T
+0K
+0:
+0$
+#152000
+1D
+1\
+1=
+1'
+#156000
+0D
+0\
+0=
+0'
+#160000
+b0 ]
+16
+1/
+b0 )
+b0 U
+b0 b
+b0 _
+b0 *
+b0 >
+b0 a
+0S
+0J
+09
+0#
+0C
+0[
+0<
+0&
+b111 (
+b111 M
+b111 X
+1D
+1\
+1=
+1'
+1T
+1K
+1:
+1$
+#164000
+0D
+0\
+0=
+0'
+#168000
+1D
+1\
+1=
+1'
+#170000
+0T
+0K
+0:
+0$
+#172000
+0D
+0\
+0=
+0'
+#176000
+1D
+1\
+1=
+1'
+#180000
+1N
+b0 (
+b0 M
+b0 X
+b0 W
+0D
+0\
+0=
+0'
+1T
+1K
+1:
+1$
+#184000
+1D
+1\
+1=
+1'
+#188000
+0D
+0\
+0=
+0'
+#190000
+0T
+0K
+0:
+0$
+#192000
+1D
+1\
+1=
+1'
+#192001
+1S
+1J
+19
+1#
+1C
+1[
+1<
+1&
+#196000
+0D
+0\
+0=
+0'
+#200000
+1D
+1\
+1=
+1'
+1T
+1K
+1:
+1$
+#204000
+0D
+0\
+0=
+0'
+#208000
+1D
+1\
+1=
+1'
+#210000
+0T
+0K
+0:
+0$
+#212000
+0D
+0\
+0=
+0'
+#216000
+1D
+1\
+1=
+1'
+#220000
+0D
+0\
+0=
+0'
+1T
+1K
+1:
+1$
+#224000
+1D
+1\
+1=
+1'
+#228000
+0D
+0\
+0=
+0'
+#230000
+0T
+0K
+0:
+0$
+#232000
+1D
+1\
+1=
+1'
+#236000
+0D
+0\
+0=
+0'
+#240000
+1D
+1\
+1=
+1'
+1T
+1K
+1:
+1$
+#244000
+0D
+0\
+0=
+0'
+#248000
+1D
+1\
+1=
+1'
+#250000
+0T
+0K
+0:
+0$
+#252000
+0D
+0\
+0=
+0'
+#256000
+1D
+1\
+1=
+1'
+#260000
+0D
+0\
+0=
+0'
+1T
+1K
+1:
+1$
+#264000
+1D
+1\
+1=
+1'
+#268000
+0D
+0\
+0=
+0'
+#270000
+0T
+0K
+0:
+0$
+#272000
+1D
+1\
+1=
+1'
+#276000
+0D
+0\
+0=
+0'
+#280000
+1D
+1\
+1=
+1'
+1T
+1K
+1:
+1$
+#284000
+0D
+0\
+0=
+0'
+#288000
+1D
+1\
+1=
+1'
+#290000
+0T
+0K
+0:
+0$
+#292000
+0D
+0\
+0=
+0'
+#296000
+1D
+1\
+1=
+1'
+#300000
+0D
+0\
+0=
+0'
+1T
+1K
+1:
+1$
+#304000
+1D
+1\
+1=
+1'
+#308000
+0D
+0\
+0=
+0'
+#310000
+0T
+0K
+0:
+0$
+#312000
+1D
+1\
+1=
+1'
+#316000
+0D
+0\
+0=
+0'
+#320000
+1D
+1\
+1=
+1'
+1T
+1K
+1:
+1$
+#324000
+0D
+0\
+0=
+0'
+#328000
+1D
+1\
+1=
+1'
+#330000
+0T
+0K
+0:
+0$
+#332000
+0D
+0\
+0=
+0'
+#336000
+1D
+1\
+1=
+1'
+#340000
+0D
+0\
+0=
+0'
+1T
+1K
+1:
+1$
+#344000
+1D
+1\
+1=
+1'
+#348000
+0D
+0\
+0=
+0'
+#350000
+0T
+0K
+0:
+0$
+#352000
+1D
+1\
+1=
+1'
+#356000
+0D
+0\
+0=
+0'
+#360000
+1D
+1\
+1=
+1'
+1T
+1K
+1:
+1$
+#364000
+0D
+0\
+0=
+0'
+#368000
+1D
+1\
+1=
+1'
+#370000
+0T
+0K
+0:
+0$
+#372000
+0D
+0\
+0=
+0'
+#376000
+1D
+1\
+1=
+1'
+#380000
+0D
+0\
+0=
+0'
+1T
+1K
+1:
+1$
+#384000
+1D
+1\
+1=
+1'
+#388000
+0D
+0\
+0=
+0'
+#390000
+0T
+0K
+0:
+0$
+#392000
+1D
+1\
+1=
+1'
+#396000
+0D
+0\
+0=
+0'
+#400000
+1D
+1\
+1=
+1'
+1T
+1K
+1:
+1$
+#404000
+0D
+0\
+0=
+0'
+#408000
+1D
+1\
+1=
+1'
+#410000
+0T
+0K
+0:
+0$
+#412000
+0D
+0\
+0=
+0'
+#416000
+1D
+1\
+1=
+1'
+#420000
+0D
+0\
+0=
+0'
+1T
+1K
+1:
+1$
+#424000
+1D
+1\
+1=
+1'
+#428000
+0D
+0\
+0=
+0'
+#430000
+0T
+0K
+0:
+0$
+#432000
+1D
+1\
+1=
+1'
