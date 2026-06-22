@@ -26,7 +26,7 @@ class FifoWriteItem(uvm_sequence_item):
 class FifoReadItem(uvm_sequence_item):
     def __init__(self, name="FifoReadItem" ):
         super().__init__(name)
-        self.r_en= self.r_en
+        self.r_en= 0
         self.data_out = 0
         self.empty    = 1
     

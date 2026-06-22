@@ -84,3 +84,19 @@ class TestReset(AsyncFifoBase):
         dut.w_rst_n.value = 1
         dut.r_rst_n.value = 1
         self.logger.info("Mid-sim re-reset: empty=1, full=0 ✓")
+
+@pyuvm.test()
+class TestWriteRead(AsyncFifoBase):
+    async def do_test(self, dut):
+        write_seq       = FifoWriteSeq("write_seq")
+        write_seq.count = 8
+        await write_seq.start(self.env.write_agent.seqr)
+
+        await ClockCycles(dut.wclk, 10)
+
+        read_seq       = FifoReadSeq("read_seq")
+        read_seq.count = 8
+        await read_seq.start(self.env.read_agent.seqr)
+
+        await ClockCycles(dut.rclk, 10)
+        self.logger.info("TestWriteRead complete")
