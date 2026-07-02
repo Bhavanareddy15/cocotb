@@ -147,6 +147,11 @@ ENV/
 env.bak/
 venv.bak/
 
+# Hardware simulation build artifacts
+sim_build/
+results.xml
+dump.vcd
+
 # Spyder project settings
 .spyderproject
 .spyproject

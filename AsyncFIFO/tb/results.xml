@@ -1,8 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1783022861" />
-    <testcase name="TestReset" classname="test_async_fifo" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="64" time="0.012998819351196289" sim_time_ns="432.0" ratio_time="33233.7874947268" />
-    <testcase name="TestWriteRead" classname="test_async_fifo" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="93" time="0.019210338592529297" sim_time_ns="1016.0" ratio_time="52888.18805073597" />
-    <testcase name="TestFullFlag" classname="test_async_fifo" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="127" time="0.11024785041809082" sim_time_ns="5064.0" ratio_time="45932.86835793976" />
-  </testsuite>
-</testsuites>

@@ -1,2 +1,2 @@
 cocotb==2.0.1
-pyuvm==3.1.0
+pyuvm==4.0.1
