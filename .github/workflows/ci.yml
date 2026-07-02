@@ -1,0 +1,58 @@
+# .github/workflows/ci.yml
+name: Async FIFO CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'AsyncFIFO/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'AsyncFIFO/**'
+
+jobs:
+  cocotb-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Icarus Verilog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install cocotb pyuvm
+
+      - name: Run AsyncFIFO tests
+        working-directory: AsyncFIFO/tb
+        run: make
+
+      - name: Publish test results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: AsyncFIFO Test Results
+          path: AsyncFIFO/tb/results.xml
+          reporter: java-junit
+          fail-on-error: true
+
+      - name: Upload waveform/logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: asyncfifo-sim-artifacts
+          path: |
+            AsyncFIFO/tb/dump.vcd
+            AsyncFIFO/tb/results.xml
