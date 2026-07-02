@@ -29,3 +29,13 @@ class FifoReadSeq(uvm_sequence):
             item.r_en = 1          # force writes enabled for basic test
             await self.start_item(item)
             await self.finish_item(item)
+
+class FifoFillSeq(FifoWriteSeq):
+    async def body(self):
+        for i in range(self.count):
+            item = FifoWriteItem("item")
+            await self.start_item(item)
+            # ← modify here, after lock acquired, before driver gets it
+            item.w_en    = 1
+            item.data_in = i & 0xFF
+            await self.finish_item(item)

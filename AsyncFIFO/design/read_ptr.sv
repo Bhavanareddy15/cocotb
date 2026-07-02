@@ -9,14 +9,12 @@ output bit empty;
 output logic [ptr_width-1:0] raddr, rptr;
 
  logic rempty;
- logic emptyr;
- logic readempty;
 
 logic [ptr_width-1:0]raddr_next;
 logic [ptr_width-1:0]rptr_next;
 
 
-assign raddr_next= raddr + (r_en & !empty);
+assign raddr_next= raddr + (r_en & !empty); //increment only if empty
 assign rptr_next=(raddr_next>>1)^raddr_next; // GRAY CONVERTED VALUE
 assign rempty= (wptr_sync == rptr_next); // CHECKING THE EMPTY CONDITION 
 

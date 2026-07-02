@@ -4,7 +4,7 @@ from cocotb.clock    import Clock
 import pyuvm
 from pyuvm import uvm_test
 
-from async_fifo_sequences import FifoReadSeq, FifoWriteSeq
+from async_fifo_sequences import FifoReadSeq, FifoWriteSeq, FifoFillSeq
  
 import sys, os
  
@@ -52,8 +52,7 @@ class AsyncFifoBase(uvm_test):
         self.drop_objection()
  
     async def do_test(self, dut):
-        cocotb.start_soon(FifoReadSeq.start(self.env.write_agent.seqr))
-        await FifoReadSeq.start(self.env.read_agent.seqr)
+        pass
  
  
 # ─────────────────────────────────────────────────────────────────────────────
@@ -85,6 +84,10 @@ class TestReset(AsyncFifoBase):
         dut.r_rst_n.value = 1
         self.logger.info("Mid-sim re-reset: empty=1, full=0 ✓")
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Test 2 — Write and then Read
+# ─────────────────────────────────────────────────────────────────────────────
+
 @pyuvm.test()
 class TestWriteRead(AsyncFifoBase):
     async def do_test(self, dut):
@@ -100,3 +103,43 @@ class TestWriteRead(AsyncFifoBase):
 
         await ClockCycles(dut.rclk, 10)
         self.logger.info("TestWriteRead complete")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Test 3 — Full Flag
+# ─────────────────────────────────────────────────────────────────────────────
+
+@pyuvm.test()
+class TestFullFlag(AsyncFifoBase):
+    async def do_test(self, dut):
+        # ── Fill the FIFO ──────────────────────────────────────────
+        write_seq       = FifoWriteSeq("write_seq")
+        write_seq.count = 409
+        await write_seq.start(self.env.write_agent.seqr)
+
+        await ClockCycles(dut.rclk, 4)
+        await ClockCycles(dut.wclk, 4)
+        assert int(dut.full.value) == 1, "full must assert after 409 writes"
+        self.logger.info("full=1 after 409 entries ✓")
+
+        # ── Attempt overflow — write monitor should NOT publish ────
+        # Scoreboard ref queue must stay at 409, not grow to 410
+        overflow_seq       = FifoWriteSeq("overflow_seq")
+        overflow_seq.count = 5
+        await overflow_seq.start(self.env.write_agent.seqr)
+
+        await ClockCycles(dut.wclk, 4)
+        assert int(dut.full.value) == 1, "full must stay asserted after overflow attempts"
+        self.logger.info("Overflow correctly suppressed ✓")
+
+        # ── Now read one entry — full must deassert ────────────────
+        read_seq       = FifoReadSeq("read_seq")
+        read_seq.count = 1
+        await read_seq.start(self.env.read_agent.seqr)
+
+        await ClockCycles(dut.rclk, 4)
+        await ClockCycles(dut.wclk, 4)
+        assert int(dut.full.value) == 0, "full must deassert after one read"
+        self.logger.info("full deasserted after one read ✓")
+
+        self.logger.info("TestFullFlag complete")

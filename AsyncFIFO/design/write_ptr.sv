@@ -36,7 +36,7 @@ if(!w_rst_n)
 else
 	full<=wfull;
 end
-assign wfull= (wptr_next=={~rptr_sync[ptr_width:ptr_width-1],rptr_sync[ptr_width-2:0]});// FULL CONDITION
+assign wfull= (wptr_next=={~rptr_sync[ptr_width-1:ptr_width-2],rptr_sync[ptr_width-3:0]});// FULL CONDITION
 	
 endmodule
   `endif
