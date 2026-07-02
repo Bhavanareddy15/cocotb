@@ -9,6 +9,8 @@ from async_fifo_sequences import FifoReadSeq, FifoWriteSeq, FifoFillSeq
 import sys, os
  
 from async_fifo_env import FifoEnv
+
+FIFO_DEPTH = 256
  
  
 # ─────────────────────────────────────────────────────────────────────────────
@@ -109,28 +111,58 @@ class TestWriteRead(AsyncFifoBase):
 # Test 3 — Full Flag
 # ─────────────────────────────────────────────────────────────────────────────
 
+
+
+async def count_accepted_writes(dut, counter):
+    """Independently tracks how many writes the DUT actually accepts,
+    instead of trusting the driver's dispatched-item count. A write is
+    accepted iff w_en=1 and full=0 at the sampled wclk edge — matching
+    the RTL's own waddr_next = waddr + (w_en & !full) logic."""
+    while True:
+        await RisingEdge(dut.wclk)
+        if int(dut.w_en.value) == 1 and int(dut.full.value) == 0:
+            counter[0] += 1
+
+
 @pyuvm.test()
 class TestFullFlag(AsyncFifoBase):
     async def do_test(self, dut):
+        accepted = [0]
+        cocotb.start_soon(count_accepted_writes(dut, accepted))
+
         # ── Fill the FIFO ──────────────────────────────────────────
-        write_seq       = FifoWriteSeq("write_seq")
-        write_seq.count = 409
+        # Dispatch more items than the FIFO can hold, so we can also
+        # verify overflow attempts are correctly rejected.
+        write_seq       = FifoFillSeq("write_seq")
+        write_seq.count = FIFO_DEPTH + 20
         assert int(dut.full.value) == 0, "full is zero before start of the test"
         await write_seq.start(self.env.write_agent.seqr)
 
         await ClockCycles(dut.rclk, 4)
         await ClockCycles(dut.wclk, 4)
-        assert int(dut.full.value) == 1, "full must assert after 409 writes"
-        self.logger.info("full=1 after 409 entries ✓")
 
-        # ── Attempt overflow — write monitor should NOT publish ────
-        # Scoreboard ref queue must stay at 409, not grow to 410
-        overflow_seq       = FifoWriteSeq("overflow_seq")
+        assert int(dut.full.value) == 1, "full must assert once FIFO is full"
+        assert accepted[0] == FIFO_DEPTH, (
+            f"expected exactly {FIFO_DEPTH} writes accepted, "
+            f"but DUT actually accepted {accepted[0]} "
+            f"(dispatched {write_seq.count} items to the driver)"
+        )
+        self.logger.info(
+            f"full=1 after {accepted[0]} real accepted writes "
+            f"(driver dispatched {write_seq.count}, "
+            f"{write_seq.count - accepted[0]} correctly suppressed) ✓"
+        )
+
+        # ── Confirm no further writes are silently accepted ────────
+        held_count = accepted[0]
+
+        overflow_seq       = FifoFillSeq("overflow_seq")
         overflow_seq.count = 5
         await overflow_seq.start(self.env.write_agent.seqr)
 
         await ClockCycles(dut.wclk, 4)
         assert int(dut.full.value) == 1, "full must stay asserted after overflow attempts"
+        assert accepted[0] == held_count, "no additional writes should be accepted while full"
         self.logger.info("Overflow correctly suppressed ✓")
 
         # ── Now read one entry — full must deassert ────────────────
