@@ -1,7 +1,7 @@
 `ifndef FIFO_MEM_SV
 `define FIFO_MEM_SV
 
-module fifo_mem #(parameter data_width =  8, ptr_width =  9, depth =409)( wclk,rclk,r_rst_n,w_rst_n,w_en,r_en,full,empty, data_in,  waddr,raddr,  data_out);
+module fifo_mem #(parameter data_width =  8, ptr_width =  9, depth = 256)( wclk,rclk,r_rst_n,w_rst_n,w_en,r_en,full,empty, data_in,  waddr,raddr,  data_out);
 
 input bit wclk,rclk,r_rst_n,w_rst_n,w_en,r_en,full,empty;
 input logic [ptr_width-1:0]  waddr, raddr;

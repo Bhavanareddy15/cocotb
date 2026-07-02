@@ -1,8 +1,8 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1783012747" />
-    <testcase name="TestReset" classname="test_async_fifo" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="62" time="0.027918577194213867" sim_time_ns="432.0" ratio_time="15473.567904081163" />
-    <testcase name="TestWriteRead" classname="test_async_fifo" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="91" time="0.04630923271179199" sim_time_ns="1016.0" ratio_time="21939.469529178572" />
-    <testcase name="TestFullFlag" classname="test_async_fifo" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="112" time="0.23697996139526367" sim_time_ns="7184.0" ratio_time="30314.79943579559" />
+    <property name="random_seed" value="1783013065" />
+    <testcase name="TestReset" classname="test_async_fifo" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="62" time="0.03142499923706055" sim_time_ns="432.0" ratio_time="13747.017040195438" />
+    <testcase name="TestWriteRead" classname="test_async_fifo" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="91" time="0.04997372627258301" sim_time_ns="1016.0" ratio_time="20330.683256601704" />
+    <testcase name="TestFullFlag" classname="test_async_fifo" file="/home/marpa/cocotb-venv/lib/python3.12/site-packages/pyuvm/extension_classes.py" lineno="112" time="0.35269999504089355" sim_time_ns="7184.0" ratio_time="20368.585486277243" />
   </testsuite>
 </testsuites>

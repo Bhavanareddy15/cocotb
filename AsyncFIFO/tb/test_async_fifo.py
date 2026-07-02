@@ -115,6 +115,7 @@ class TestFullFlag(AsyncFifoBase):
         # ── Fill the FIFO ──────────────────────────────────────────
         write_seq       = FifoWriteSeq("write_seq")
         write_seq.count = 409
+        assert int(dut.full.value) == 0, "full is zero before start of the test"
         await write_seq.start(self.env.write_agent.seqr)
 
         await ClockCycles(dut.rclk, 4)
