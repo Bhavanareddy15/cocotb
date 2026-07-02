@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Icarus Verilog
         run: |
@@ -26,7 +26,7 @@ jobs:
           sudo apt-get install -y iverilog
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -41,7 +41,7 @@ jobs:
 
       - name: Publish test results
         if: always()
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         with:
           name: AsyncFIFO Test Results
           path: AsyncFIFO/tb/results.xml
@@ -50,7 +50,7 @@ jobs:
 
       - name: Upload waveform/logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: asyncfifo-sim-artifacts
           path: |
