@@ -10,7 +10,7 @@
 // Memory
 `include "../design/fifo_mem.sv"
 
-module top #(parameter depth=409, data_width=8, ptr_width=9) (
+module top #(parameter depth=256, data_width=8, ptr_width=9) (
     input  logic                  wclk,
     input  logic                  w_rst_n,
     input  logic                  rclk,
@@ -23,6 +23,8 @@ module top #(parameter depth=409, data_width=8, ptr_width=9) (
     output logic                  empty
 );
 
+    localparam ADDRSIZE = ptr_width - 1;   // 8
+
     // Internal signals
     logic [ptr_width-1:0] wptr;
     logic [ptr_width-1:0] rptr;
@@ -30,6 +32,8 @@ module top #(parameter depth=409, data_width=8, ptr_width=9) (
     logic [ptr_width-1:0] rptr_sync;
     logic [ptr_width-1:0] waddr;
     logic [ptr_width-1:0] raddr;
+
+    
 
     // 2-flop synchronizers
     w2rsync #(ptr_width) w2rsync_inst (
@@ -79,8 +83,8 @@ module top #(parameter depth=409, data_width=8, ptr_width=9) (
         .full    (full),
         .empty   (empty),
         .data_in (data_in),
-        .waddr   (waddr),
-        .raddr   (raddr),
+        .waddr   (waddr[ADDRSIZE-1:0]),
+        .raddr   (raddr[ADDRSIZE-1:0]),
         .data_out(data_out)
     );
 
