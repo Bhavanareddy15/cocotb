@@ -3,12 +3,13 @@ from cocotb.triggers import RisingEdge, Timer
 from pyuvm import uvm_component, uvm_tlm_analysis_fifo
 
 from fifo_model import FifoModel
+from fifo_config import FIFO_DEPTH   # or wherever you centralize it
 
 class FifoScoreboard(uvm_component):
     def build_phase(self):
         self.write_fifo = uvm_tlm_analysis_fifo("write_fifo", self)
         self.read_fifo  = uvm_tlm_analysis_fifo("read_fifo", self)
-        self.ref_model  = FifoModel(depth=16)  # match your RTL depth
+        self.ref_model  = FifoModel(depth=FIFO_DEPTH)  # match your RTL depth
 
     async def run_phase(self):
         self.logger.info("Scoreboard started")
@@ -32,4 +33,5 @@ class FifoScoreboard(uvm_component):
                 self.logger.info(f"PASS: expected 0x{expected:02X} got 0x{read_item.data_out:02X}")
             else:
                 self.logger.error(f"FAIL: expected 0x{expected:02X} got 0x{read_item.data_out:02X}")
+
                 

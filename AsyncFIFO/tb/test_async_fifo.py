@@ -123,6 +123,12 @@ async def count_accepted_writes(dut, counter):
         if int(dut.w_en.value) == 1 and int(dut.full.value) == 0:
             counter[0] += 1
 
+async def count_accepted_reads(dut, counter):
+    while True:
+        await RisingEdge(dut.rclk)
+        if int(dut.r_en.value) == 1 and int(dut.empty.value) == 0:
+            counter[0] += 1
+
 
 @pyuvm.test()
 class TestFullFlag(AsyncFifoBase):
@@ -176,3 +182,46 @@ class TestFullFlag(AsyncFifoBase):
         self.logger.info("full deasserted after one read ✓")
 
         self.logger.info("TestFullFlag complete")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Test 4 — Wraparound / multi-lap regression
+# Directly targets the addressing bug class we found: fill -> drain -> fill
+# again, several times, so waddr/raddr genuinely wrap past the array bound
+# more than once. Relies on the existing scoreboard (wired via monitors) to
+# catch any data corruption across a wraparound.
+# ─────────────────────────────────────────────────────────────────────────────
+
+@pyuvm.test()
+class TestWraparound(AsyncFifoBase):
+    async def do_test(self, dut):
+        LAPS = 3
+        w_acc, r_acc = [0], [0]
+        cocotb.start_soon(count_accepted_writes(dut, w_acc))
+        cocotb.start_soon(count_accepted_reads(dut, r_acc))
+
+        for lap in range(LAPS):
+            w0, r0 = w_acc[0], r_acc[0]
+
+            write_seq       = FifoWriteSeq("write_seq")
+            write_seq.count = FIFO_DEPTH
+            await write_seq.start(self.env.write_agent.seqr)
+            await ClockCycles(dut.wclk, 4)
+
+            assert w_acc[0] - w0 == FIFO_DEPTH, (
+                f"lap {lap}: expected {FIFO_DEPTH} accepted writes, got {w_acc[0]-w0}"
+            )
+            assert int(dut.full.value) == 1, f"lap {lap}: full must assert after filling"
+
+            read_seq       = FifoReadSeq("read_seq")
+            read_seq.count = FIFO_DEPTH
+            await read_seq.start(self.env.read_agent.seqr)
+            await ClockCycles(dut.rclk, 4)
+
+            assert r_acc[0] - r0 == FIFO_DEPTH, (
+                f"lap {lap}: expected {FIFO_DEPTH} accepted reads, got {r_acc[0]-r0}"
+            )
+            assert int(dut.empty.value) == 1, f"lap {lap}: empty must assert after draining"
+
+            self.logger.info(f"Lap {lap}: {FIFO_DEPTH} written and drained cleanly, wraparound OK ✓")
+
+        self.logger.info(f"TestWraparound complete — {LAPS} laps, no address corruption")
